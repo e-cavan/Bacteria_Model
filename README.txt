@@ -1,1 +1,1 @@
-Bacteria model v1 - loops
+Bacteria model v1
