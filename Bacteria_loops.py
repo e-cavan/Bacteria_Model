@@ -19,7 +19,6 @@ t = sc.linspace(0,100,101)
 x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
 
 
-
 gt = 0
 rgt = 0
 et = 0
