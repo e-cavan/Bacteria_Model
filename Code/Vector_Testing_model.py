@@ -139,19 +139,19 @@ plt.show()
 
 ### Solving using sympy 
 
-# from sympy import *
-# import scipy as sc
-# u1, u2, S, l, Rg, Rm1, Rm2, C1, C2,rho, t = var("u1, u2, S, l, Rg, Rm1, Rm2, C1, C2, rho,t",real = True)
+from sympy import *
+import scipy as sc
+u1, u2, S, Rg, Rm1, Rm2, C1, C2,rho, t = var("u1, u2, S, Rg, Rm1, Rm2, C1, C2, rho,t",real = True)
 
-# dC1_dt = C1 * ((u1 * S * (1-Rg-l)) - Rm1)
-# dC2_dt = C2 * ((u2 * S * (1-Rg-l)) - Rm2)
-# dS_dt = rho - (((u1 * S * C1) - (C1 * S * u1 * l)) + (u2 * S * C2) - (C2 * S * u2 * l))
-# dC1_dt, dC2_dt, dS_dt
-# C1_eqlb = Eq(dC1_dt, 0)
-# C2_eqlb = Eq(dC2_dt, 0)
-# S_eqlb = Eq(dS_dt, 0)
-# C1_eqlb,C2_eqlb, S_eqlb
-# C1_eqlb_sol = solve(C1_eqlb, S)
-# C2_eqlb_sol = solve(C2_eqlb, S)
-# S_eqlb_sol = solve(S_eqlb, C1)
-# print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
+dC1_dt = C1 * ((u1 * S * (1-Rg)) - Rm1)
+dC2_dt = C2 * ((u2 * S * (1-Rg)) - Rm2)
+dS_dt = rho - ((u1 * S * C1) + (u2 * S * C2))
+dC1_dt, dC2_dt, dS_dt
+C1_eqlb = Eq(dC1_dt, 0)
+C2_eqlb = Eq(dC2_dt, 0)
+S_eqlb = Eq(dS_dt, 0)
+C1_eqlb,C2_eqlb, S_eqlb
+C1_eqlb_sol = solve(C1_eqlb, S)
+C2_eqlb_sol = solve(C2_eqlb, S)
+S_eqlb_sol = solve(S_eqlb, C1)
+print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
