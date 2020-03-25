@@ -90,19 +90,19 @@ def metabolic_model(pops,t):
 ######## Set up parameters ###########
 
 N = 10 # Number of species
-M = 10 # Number of nutrients
+M = 5 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
 pk = 20 # Peak above Tref ('low' = 12 and 'high' = 20)
 T_pk = Tref + pk
-B_g = 0.5 # B0 for growth
-B_rm = 0.1 # B0 for respiration (maintence)
+B_g = 0.5 #np.concatenate([np.repeat(0.7,5), np.repeat(0.4,5)]) # B0 for growth
+B_rm = 0.1 #np.concatenate([np.repeat(0.3,5), np.repeat(0.1,5)]) #0.1 # B0 for respiration (maintence)
 #B_g = np.repeat(np.array([0.3, 0.4, 0.5, 0.6, 0.7]),Fg_num)
 #B_rm = (0.5 * B_g) - 0.1
 Ma = 1 # Mass
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.65,3), np.repeat(0.5,5), np.repeat(1.0,2)])
+Ea = np.concatenate([np.repeat(0.6,5), np.repeat(1.0,5)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
 t_fin = 100
 t = sc.linspace(0,t_fin-1,t_fin)
@@ -139,19 +139,19 @@ plt.show()
 
 ### Solving using sympy 
 
-from sympy import *
-import scipy as sc
-u1, u2, S, Rg, Rm1, Rm2, C1, C2,rho, t = var("u1, u2, S, Rg, Rm1, Rm2, C1, C2, rho,t",real = True)
+# from sympy import *
+# import scipy as sc
+# u1, u2, S, Rg, Rm1, Rm2, C1, C2,rho, t = var("u1, u2, S, Rg, Rm1, Rm2, C1, C2, rho,t",real = True)
 
-dC1_dt = C1 * ((u1 * S * (1-Rg)) - Rm1)
-dC2_dt = C2 * ((u2 * S * (1-Rg)) - Rm2)
-dS_dt = rho - ((u1 * S * C1) + (u2 * S * C2))
-dC1_dt, dC2_dt, dS_dt
-C1_eqlb = Eq(dC1_dt, 0)
-C2_eqlb = Eq(dC2_dt, 0)
-S_eqlb = Eq(dS_dt, 0)
-C1_eqlb,C2_eqlb, S_eqlb
-C1_eqlb_sol = solve(C1_eqlb, S)
-C2_eqlb_sol = solve(C2_eqlb, S)
-S_eqlb_sol = solve(S_eqlb, C1)
-print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
+# dC1_dt = C1 * ((u1 * S * (1-Rg)) - Rm1)
+# dC2_dt = C2 * ((u2 * S * (1-Rg)) - Rm2)
+# dS_dt = rho - ((u1 * S * C1) + (u2 * S * C2))
+# dC1_dt, dC2_dt, dS_dt
+# C1_eqlb = Eq(dC1_dt, 0)
+# C2_eqlb = Eq(dC2_dt, 0)
+# S_eqlb = Eq(dS_dt, 0)
+# C1_eqlb,C2_eqlb, S_eqlb
+# C1_eqlb_sol = solve(C1_eqlb, S)
+# C2_eqlb_sol = solve(C2_eqlb, S)
+# S_eqlb_sol = solve(S_eqlb, C1)
+# print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
