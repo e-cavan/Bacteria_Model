@@ -155,3 +155,30 @@ plt.show()
 # C2_eqlb_sol = solve(C2_eqlb, S)
 # S_eqlb_sol = solve(S_eqlb, C1)
 # print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
+
+# k = 0.0000862
+# Rg = 0
+# l = 0.4
+# T = 293.15
+# Tref = 273.15
+# Ma = 1
+# B_rm = 0.1
+# p=1
+
+# C = sc.linspace(0.001,10,100)
+# l=0.4
+# Ea = -(k * np.log((p[0] * (1-Rg[0]-l))/ (C * B_rm * Ma**-0.25 * (1-l))))/((1/T)-(1/Tref))
+
+# from sklearn import linear_model
+# lm = linear_model.LinearRegression()
+# model = lm.fit(Ea.reshape(-1,1),np.log(C))
+
+
+# Ea1 = sc.linspace(0,4,100)
+# C1 = np.exp(lm.intercept_ + (Ea1 * lm.coef_[1]))
+
+# plt.plot(Ea1, C1, 'g-', label = 'Consumers', linewidth=0.7)
+# plt.grid
+# plt.ylabel('Bacteria Biomass')
+# plt.xlabel('Activation Energy')
+# plt.show()
