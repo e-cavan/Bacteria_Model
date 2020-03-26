@@ -62,7 +62,7 @@ def params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D):
     l[M-1,0] = 0.4
 
     # External resource input
-    p = np.concatenate((np.array([1]), np.repeat(1,M-1))) #np.ones(M)
+    p = np.concatenate((np.array([1]), np.repeat(0,M-1))) #np.ones(M)
 
     return U, Rm, Rg, l, p
 
@@ -89,8 +89,8 @@ def metabolic_model(pops,t):
 
 ######## Set up parameters ###########
 
-N = 10 # Number of species
-M = 5 # Number of nutrients
+N = 2 # Number of species
+M = 2 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
@@ -102,7 +102,7 @@ B_rm = 0.1 #np.concatenate([np.repeat(0.3,5), np.repeat(0.1,5)]) #0.1 # B0 for r
 #B_rm = (0.5 * B_g) - 0.1
 Ma = 1 # Mass
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.6,5), np.repeat(1.0,5)])
+Ea = np.concatenate([np.repeat(0.6,1), np.repeat(1.0,1)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
 t_fin = 100
 t = sc.linspace(0,t_fin-1,t_fin)
