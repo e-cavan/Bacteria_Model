@@ -14,12 +14,12 @@ import itertools
 
 # B0 for uptake
 def size_growth(B_g, Ma):
-    B0_g = B_g * Ma**0.75
+    B0_g = B_g * Ma**-0.25
     return B0_g
 
 # B0 for maintenance respiration
 def size_resp(B_rm, Ma):
-    B0_rm = B_rm * Ma**0.75
+    B0_rm = B_rm * Ma**-0.25
     return B0_rm
 
 # Arrhenius/Sharpe-Schoolfield for uptake
@@ -62,11 +62,11 @@ def params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D):
     l[M-1,0] = 0.4
 
     # External resource input
-    p = np.concatenate((np.array([1]), np.repeat(0,M-1))) #np.ones(M)
+    p = np.concatenate((np.array([1]), np.repeat(1,M-1))) #np.ones(M)
 
     return U, Rm, Rg, l, p
 
-def metabolic_model(pops,t):
+def metabolic_model(pops,t, U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_rm, B_g, Ma, k):
     x = pops
 
     xc =  x[0:N] # consumer
@@ -81,7 +81,7 @@ def metabolic_model(pops,t):
     dCdt = xc * C
     
     ## Resources
-    dSdt = p - np.multiply((xc @ U).transpose(), xr) + np.einsum('i,k,ik,kj->j', xc, xr, U, l)
+    dSdt = p - (np.multiply((xc @ U).transpose(), xr) - np.einsum('i,k,ik,kj->j', xc, xr, U, l))
 
     return np.array(np.concatenate((dCdt, dSdt)))
 
@@ -89,8 +89,8 @@ def metabolic_model(pops,t):
 
 ######## Set up parameters ###########
 
-N = 2 # Number of species
-M = 2 # Number of nutrients
+N = 10 # Number of species
+M = 5 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
@@ -102,7 +102,7 @@ B_rm = 0.1 #np.concatenate([np.repeat(0.3,5), np.repeat(0.1,5)]) #0.1 # B0 for r
 #B_rm = (0.5 * B_g) - 0.1
 Ma = 1 # Mass
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.6,1), np.repeat(1.0,1)])
+Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(1.0,N/2)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
 t_fin = 100
 t = sc.linspace(0,t_fin-1,t_fin)
@@ -121,7 +121,8 @@ p = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[4]
 l_sum = np.sum(l, axis=1)
 
 # Run model
-pops = odeint(metabolic_model, y0=x0, t=t)
+pars = (U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_rm, B_g, Ma, k)
+pops = odeint(metabolic_model, y0=x0, t=t, args = (pars))
 print(pops[t_fin-1,:])
 
 #### Plot output ####

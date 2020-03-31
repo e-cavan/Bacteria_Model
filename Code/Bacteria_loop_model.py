@@ -110,8 +110,8 @@ def metabolic_model(pops,t):
 
 ######## Set up parameters ###########
 
-N = 2 # Number of species
-M = 1 # Number of nutrients
+N = 10 # Number of species
+M = 5 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
