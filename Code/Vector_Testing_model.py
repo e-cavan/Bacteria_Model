@@ -89,8 +89,8 @@ def metabolic_model(pops,t, U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_r
 
 ######## Set up parameters ###########
 
-N = 10 # Number of species
-M = 5 # Number of nutrients
+N = 2 # Number of species
+M = 2 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
@@ -102,7 +102,7 @@ B_rm = 0.1 #np.concatenate([np.repeat(0.3,5), np.repeat(0.1,5)]) #0.1 # B0 for r
 #B_rm = (0.5 * B_g) - 0.1
 Ma = 1 # Mass
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(1.0,N/2)])
+Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(0.6,N/2)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
 t_fin = 100
 t = sc.linspace(0,t_fin-1,t_fin)
@@ -110,7 +110,8 @@ t = sc.linspace(0,t_fin-1,t_fin)
 
 ##### Intergrate system forward #####
 result_array = np.empty((0,N+M)) 
-x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
+#x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
+x0 = np.array([(1.76*1),(1.76*1),(0.47*1), 0.47])
 
 # Set up model
 U = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[0]
@@ -132,9 +133,9 @@ plt.plot(t, pops[:,N:N+M], 'b-', label = 'Resources', linewidth=0.7)
 plt.grid
 plt.ylabel('Population density')
 plt.xlabel('Time')
-plt.title('Bacteria-Nutrients population dynamics')
-plt.legend([Line2D([0], [0], color='green', lw=2), Line2D([0], [0], color='blue', lw=2)], ['Bacteria', 'Nutrients'])
-#plt.savefig('Figure_ein_exist.png')
+plt.title('Bacteria-Substrate population dynamics')
+plt.legend([Line2D([0], [0], color='green', lw=2), Line2D([0], [0], color='blue', lw=2)], ['Bacteria', 'Substrate'])
+plt.savefig('Figure_ein_exist.png')
 plt.show()
 
 
