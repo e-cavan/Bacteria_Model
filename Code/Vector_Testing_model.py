@@ -90,7 +90,7 @@ def metabolic_model(pops,t, U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_r
 ######## Set up parameters ###########
 
 N = 2 # Number of species
-M = 2 # Number of nutrients
+M = 1 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
@@ -102,16 +102,16 @@ B_rm = 0.1 #np.concatenate([np.repeat(0.3,5), np.repeat(0.1,5)]) #0.1 # B0 for r
 #B_rm = (0.5 * B_g) - 0.1
 Ma = 1 # Mass
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(0.6,N/2)])
+Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(1.0,N/2)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
-t_fin = 100
+t_fin = 1000
 t = sc.linspace(0,t_fin-1,t_fin)
 
 
 ##### Intergrate system forward #####
 result_array = np.empty((0,N+M)) 
-#x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
-x0 = np.array([(1.76*1),(1.76*1),(0.47*1), 0.47])
+x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
+#x0 = np.array([(0.17),(0.50),(0.33)])
 
 # Set up model
 U = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[0]
@@ -124,7 +124,7 @@ l_sum = np.sum(l, axis=1)
 # Run model
 pars = (U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_rm, B_g, Ma, k)
 pops = odeint(metabolic_model, y0=x0, t=t, args = (pars))
-print(pops[t_fin-1,:])
+#print(pops[t_fin-1,:])
 
 #### Plot output ####
 t_plot = sc.linspace(0,len(result_array),len(result_array))
@@ -136,51 +136,87 @@ plt.xlabel('Time')
 plt.title('Bacteria-Substrate population dynamics')
 plt.legend([Line2D([0], [0], color='green', lw=2), Line2D([0], [0], color='blue', lw=2)], ['Bacteria', 'Substrate'])
 plt.savefig('Figure_ein_exist.png')
-plt.show()
+#plt.show()
 
 
-### Solving using sympy 
+# ---------------------------------------------------
 
-# from sympy import *
-# import scipy as sc
-# u1, u2, S, Rg, Rm1, Rm2, C1, C2,rho, t = var("u1, u2, S, Rg, Rm1, Rm2, C1, C2, rho,t",real = True)
+### Findiong equil solutions using sympy 
 
-# dC1_dt = C1 * ((u1 * S * (1-Rg)) - Rm1)
-# dC2_dt = C2 * ((u2 * S * (1-Rg)) - Rm2)
-# dS_dt = rho - ((u1 * S * C1) + (u2 * S * C2))
-# dC1_dt, dC2_dt, dS_dt
-# C1_eqlb = Eq(dC1_dt, 0)
-# C2_eqlb = Eq(dC2_dt, 0)
-# S_eqlb = Eq(dS_dt, 0)
-# C1_eqlb,C2_eqlb, S_eqlb
-# C1_eqlb_sol = solve(C1_eqlb, S)
-# C2_eqlb_sol = solve(C2_eqlb, S)
-# S_eqlb_sol = solve(S_eqlb, C1)
-# print(C1_eqlb_sol);print(C2_eqlb_sol); print(S_eqlb_sol); print(solve((C1_eqlb,C2_eqlb, S_eqlb), C1,C2,S))
+from sympy import *
+import scipy as sc
+u1, u2, S, Rg, Rm1, Rm2,a, C1, C2,rho, t = var("u1, u2, S, Rg, Rm1, Rm2,a, C1, C2, rho,t",real = True)
 
-# k = 0.0000862
-# Rg = 0
-# l = 0.4
-# T = 293.15
-# Tref = 273.15
-# Ma = 1
-# B_rm = 0.1
-# p=1
+dC1_dt = C1 * ((u1 * S * (1-Rg-a)) - Rm1)
+dC2_dt = C2 * ((u2 * S * (1-Rg-a)) - Rm2)
+dS_dt = rho - ((u1 * S * C1) - (u1 * S * C1 * a)) - ((u2 * S * C2) - (u2 * S * C2 * a))
+dC1_dt, dC2_dt, dS_dt
+C1_eqlb = Eq(dC1_dt, 0)
+C2_eqlb = Eq(dC2_dt, 0)
+S_eqlb = Eq(dS_dt, 0)
+C1_eqlb,C2_eqlb, S_eqlb
+C1_eqlb_sol = solve(C1_eqlb, S)
+C2_eqlb_sol = solve(C2_eqlb, S)
+S_eqlb_sol = solve(S_eqlb, C1)
 
-# C = sc.linspace(0.001,10,100)
-# l=0.4
-# Ea = -(k * np.log((p[0] * (1-Rg[0]-l))/ (C * B_rm * Ma**-0.25 * (1-l))))/((1/T)-(1/Tref))
+### Phase plane analysis (2 species, 1 resource)
 
-# from sklearn import linear_model
-# lm = linear_model.LinearRegression()
-# model = lm.fit(Ea.reshape(-1,1),np.log(C))
+import matplotlib.cm
+import pylab as p
+import matplotlib.cm
+from scipy import integrate
 
 
-# Ea1 = sc.linspace(0,4,100)
-# C1 = np.exp(lm.intercept_ + (Ea1 * lm.coef_[1]))
+u = 2.84
+a = 0.4
+Rm = 0.57
+row=1
 
-# plt.plot(Ea1, C1, 'g-', label = 'Consumers', linewidth=0.7)
-# plt.grid
-# plt.ylabel('Bacteria Biomass')
-# plt.xlabel('Activation Energy')
-# plt.show()
+
+def dX_dt(X, t = 0):
+    dC = X[0] * ((u * X[2] * (1-a) - Rm))
+    dC1 = X[1] * ((u * X[2] * (1-a) - Rm))
+    dS = row - (X[0] * X[2] * u) + (X[0] * X[2] * u * a) - (X[0] * X[2] * u) + (X[0] * X[2] * u * a)
+    return np.array([dC, dC1, dS])
+              
+values  = sc.linspace(0.3, 0.9, 5)                          # position of X0 between X_f0 and X_f1
+vcolors = p.cm.autumn_r(sc.linspace(0.3, 1., len(values)))  # colors for each trajectory
+
+X_f0 = np.array([     0. ,  0. , 0.])
+X_f1 = np.array([ row/(2*Rm), row/(2*Rm), -Rm/(u*(a-1))])
+
+t = sc.linspace(0, 15,  1000)
+
+f2 = p.figure()
+for v, col in zip(values, vcolors):
+    X0 = v * X_f1                               # starting point
+    X = integrate.odeint(dX_dt, X0, t)         # we don't need infodict here
+    p.plot( X[:,0], X[:,1], lw=3.5*v, color=col, label='X0=(%.1f, %.1f)' % ( X0[0], X0[1]) )
+
+ymax = p.ylim(ymin=0)[1]                        # get axis limits
+xmax = p.xlim(xmin=0)[1]
+nb_points   = 40
+
+x = sc.linspace(0, xmax, nb_points)
+y = sc.linspace(0, ymax, nb_points)
+z = sc.linspace(0, 1, nb_points)
+
+X1 , Y1  = np.meshgrid(x, y)                       # create a grid
+q = dX_dt([X1, Y1, z])  
+DX1, DY1 = q[0,:,:] , q[1,:,:]                      # compute growth rate on the gridt
+M = (np.hypot(DX1, DY1))                           # Norm of the growth rate 
+M[ M == 0] = 1.                                 # Avoid zero division errors 
+DX1 /= M                                        # Normalize each arrows
+DY1 /= M
+
+#-------------------------------------------------------
+# Drow direction fields, using matplotlib 's quiver function
+p.title('Trajectories and direction fields')
+Q = p.quiver(X1, Y1, DX1, DY1, M, pivot='mid', cmap=p.cm.jet)
+p.xlabel('Number of Bacteria 1')
+p.ylabel('Number of Bacteria 2')
+p.legend()
+p.grid()
+p.xlim(0, xmax)
+p.ylim(0, ymax)
+p.show()
