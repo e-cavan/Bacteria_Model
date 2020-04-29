@@ -36,8 +36,8 @@ def temp_resp(k, T, Tref, T_pk,N, B_rm, Ma, Ea, Ea_D):
 def params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D):
     #Uptake
     u1 = np.zeros([M,M]) # M M
-    u_temp = temp_growth(k, T, Tref, T_pk, N, B_g, Ma, Ea, Ea_D) # uptake rates and maintenance are temp-dependant
-    #u_temp = np.array([2.128953, 2.128953])
+    #u_temp = temp_growth(k, T, Tref, T_pk, N, B_g, Ma, Ea, Ea_D) # uptake rates and maintenance are temp-dependant
+    u_temp = np.array([10, 20])
     np.fill_diagonal(u1,u_temp) # fill in temp dependant uptake on diagonals
     #np.fill_diagonal(u1,1) # fill in temp dependant uptake on diagonals
     u2 = np.zeros([M,M])
@@ -46,11 +46,12 @@ def params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D):
     else:
         np.fill_diagonal(u2,u_temp[M:M*2]) # fill in temp dependant uptake on diagonals
         U = np.concatenate((u1, u2), axis=0)  
-
+    
     # Maintenance respiration
-    ar_rm = temp_resp(k, T, Tref,T_pk, N, B_rm, Ma, Ea, Ea_D) # find how varies with temperature (ar = arrhenius)
+    #ar_rm = temp_resp(k, T, Tref,T_pk, N, B_rm, Ma, Ea, Ea_D) # find how varies with temperature (ar = arrhenius)
     #Rm = sc.full([N], (0.5))
-    Rm = ar_rm
+    Rm = np.array([1, 2])
+    #Rm = ar_rm
     
     # Growth respiration
     Rg = sc.full([M], (0))
@@ -104,14 +105,14 @@ Ma = 1 # Mass
 T = 273.15+20
 Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(1.0,N/2)])
 Ea_D = np.repeat(3.5,N) # Deactivation energy
-t_fin = 1000
+t_fin = 1000000
 t = sc.linspace(0,t_fin-1,t_fin)
 
 
 ##### Intergrate system forward #####
 result_array = np.empty((0,N+M)) 
 x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
-#x0 = np.array([(0.17),(0.50),(0.33)])
+#x0 = np.array([(0.11135157),(0.29801513),(0.33)])
 
 # Set up model
 U = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[0]
@@ -124,7 +125,7 @@ l_sum = np.sum(l, axis=1)
 # Run model
 pars = (U, Rm, Rg, l, p, l_sum, Ea, Ea_D, N, M, T, Tref, B_rm, B_g, Ma, k)
 pops = odeint(metabolic_model, y0=x0, t=t, args = (pars))
-#print(pops[t_fin-1,:])
+print(pops[t_fin-1,:])
 
 #### Plot output ####
 t_plot = sc.linspace(0,len(result_array),len(result_array))
@@ -136,7 +137,7 @@ plt.xlabel('Time')
 plt.title('Bacteria-Substrate population dynamics')
 plt.legend([Line2D([0], [0], color='green', lw=2), Line2D([0], [0], color='blue', lw=2)], ['Bacteria', 'Substrate'])
 plt.savefig('Figure_ein_exist.png')
-#plt.show()
+plt.show()
 
 
 # ---------------------------------------------------
@@ -161,62 +162,62 @@ S_eqlb_sol = solve(S_eqlb, C1)
 
 ### Phase plane analysis (2 species, 1 resource)
 
-import matplotlib.cm
-import pylab as p
-import matplotlib.cm
-from scipy import integrate
+# import matplotlib.cm
+# import pylab as p
+# import matplotlib.cm
+# from scipy import integrate
 
 
-u = 2.84
-a = 0.4
-Rm = 0.57
-row=1
+# u = 2.84
+# a = 0.4
+# Rm = 0.57
+# row=1
 
 
-def dX_dt(X, t = 0):
-    dC = X[0] * ((u * X[2] * (1-a) - Rm))
-    dC1 = X[1] * ((u * X[2] * (1-a) - Rm))
-    dS = row - (X[0] * X[2] * u) + (X[0] * X[2] * u * a) - (X[0] * X[2] * u) + (X[0] * X[2] * u * a)
-    return np.array([dC, dC1, dS])
+# def dX_dt(X, t = 0):
+#     dC = X[0] * ((u * X[2] * (1-a) - Rm))
+#     dC1 = X[1] * ((u * X[2] * (1-a) - Rm))
+#     dS = row - (X[0] * X[2] * u) + (X[0] * X[2] * u * a) - (X[0] * X[2] * u) + (X[0] * X[2] * u * a)
+#     return np.array([dC, dC1, dS])
               
-values  = sc.linspace(0.3, 0.9, 5)                          # position of X0 between X_f0 and X_f1
-vcolors = p.cm.autumn_r(sc.linspace(0.3, 1., len(values)))  # colors for each trajectory
+# values  = sc.linspace(0.3, 0.9, 5)                          # position of X0 between X_f0 and X_f1
+# vcolors = p.cm.autumn_r(sc.linspace(0.3, 1., len(values)))  # colors for each trajectory
 
-X_f0 = np.array([     0. ,  0. , 0.])
-X_f1 = np.array([ row/(2*Rm), row/(2*Rm), -Rm/(u*(a-1))])
+# X_f0 = np.array([     0. ,  0. , 0.])
+# X_f1 = np.array([ row/(2*Rm), row/(2*Rm), -Rm/(u*(a-1))])
 
-t = sc.linspace(0, 15,  1000)
+# t = sc.linspace(0, 15,  1000)
 
-f2 = p.figure()
-for v, col in zip(values, vcolors):
-    X0 = v * X_f1                               # starting point
-    X = integrate.odeint(dX_dt, X0, t)         # we don't need infodict here
-    p.plot( X[:,0], X[:,1], lw=3.5*v, color=col, label='X0=(%.1f, %.1f)' % ( X0[0], X0[1]) )
+# f2 = p.figure()
+# for v, col in zip(values, vcolors):
+#     X0 = v * X_f1                               # starting point
+#     X = integrate.odeint(dX_dt, X0, t)         # we don't need infodict here
+#     p.plot( X[:,0], X[:,1], lw=3.5*v, color=col, label='X0=(%.1f, %.1f)' % ( X0[0], X0[1]) )
 
-ymax = p.ylim(ymin=0)[1]                        # get axis limits
-xmax = p.xlim(xmin=0)[1]
-nb_points   = 40
+# ymax = p.ylim(ymin=0)[1]                        # get axis limits
+# xmax = p.xlim(xmin=0)[1]
+# nb_points   = 40
 
-x = sc.linspace(0, xmax, nb_points)
-y = sc.linspace(0, ymax, nb_points)
-z = sc.linspace(0, 1, nb_points)
+# x = sc.linspace(0, xmax, nb_points)
+# y = sc.linspace(0, ymax, nb_points)
+# z = sc.linspace(0, 1, nb_points)
 
-X1 , Y1  = np.meshgrid(x, y)                       # create a grid
-q = dX_dt([X1, Y1, z])  
-DX1, DY1 = q[0,:,:] , q[1,:,:]                      # compute growth rate on the gridt
-M = (np.hypot(DX1, DY1))                           # Norm of the growth rate 
-M[ M == 0] = 1.                                 # Avoid zero division errors 
-DX1 /= M                                        # Normalize each arrows
-DY1 /= M
+# X1 , Y1  = np.meshgrid(x, y)                       # create a grid
+# q = dX_dt([X1, Y1, z])  
+# DX1, DY1 = q[0,:,:] , q[1,:,:]                      # compute growth rate on the gridt
+# M = (np.hypot(DX1, DY1))                           # Norm of the growth rate 
+# M[ M == 0] = 1.                                 # Avoid zero division errors 
+# DX1 /= M                                        # Normalize each arrows
+# DY1 /= M
 
-#-------------------------------------------------------
-# Drow direction fields, using matplotlib 's quiver function
-p.title('Trajectories and direction fields')
-Q = p.quiver(X1, Y1, DX1, DY1, M, pivot='mid', cmap=p.cm.jet)
-p.xlabel('Number of Bacteria 1')
-p.ylabel('Number of Bacteria 2')
-p.legend()
-p.grid()
-p.xlim(0, xmax)
-p.ylim(0, ymax)
-p.show()
+# #-------------------------------------------------------
+# # Drow direction fields, using matplotlib 's quiver function
+# p.title('Trajectories and direction fields')
+# Q = p.quiver(X1, Y1, DX1, DY1, M, pivot='mid', cmap=p.cm.jet)
+# p.xlabel('Number of Bacteria 1')
+# p.ylabel('Number of Bacteria 2')
+# p.legend()
+# p.grid()
+# p.xlim(0, xmax)
+# p.ylim(0, ymax)
+# p.show()

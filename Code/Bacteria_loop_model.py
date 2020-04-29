@@ -110,8 +110,8 @@ def metabolic_model(pops,t):
 
 ######## Set up parameters ###########
 
-N = 10 # Number of species
-M = 5 # Number of nutrients
+N = 2 # Number of species
+M = 1 # Number of nutrients
 K = 2 # number of species (* 100)
 k = 0.0000862
 Tref = 273.15 # 0 degrees C
@@ -121,11 +121,11 @@ B_g = 0.5 # B0 for growth
 B_rm = 0.1 # B0 for respiration (maintence)
 Ma = 1 # Mass
 Ea_D = np.repeat(3.5,N) # Deactivation energy
-t_fin = 100
+t_fin = 1000000
 t = sc.linspace(0,t_fin-1,t_fin)
 x0 = np.concatenate((sc.full([N], (0.1)),sc.full([M], (1.0))))
 T = 273.15+20
-Ea = np.concatenate([np.repeat(0.6,N/2), np.repeat(1.0,N/2)])
+Ea = np.concatenate([np.repeat(0.4,N/2), np.repeat(1.5,N/2)])
 U = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[0] # make less than 1
 Rm = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[1] # make less than 1
 Rg = params(N, M, T, k, Tref, T_pk, B_g, B_rm,Ma, Ea, Ea_D)[2] # l + Rg must be less than 1
